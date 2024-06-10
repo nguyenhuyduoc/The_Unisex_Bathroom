@@ -1,5 +1,5 @@
 # Compile Program
 To compile program
-'''cpp
+```cpp
 ./a.exe
-'''
+```
