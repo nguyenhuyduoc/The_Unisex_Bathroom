@@ -1,0 +1,12 @@
+Girl 1 gets in, Girl 2 gets in, Boy 3 comes and waits because the bathroom is being used by Girl, Girl 2 gets out, Girl 1 gets out, 
+
+Boy 3 gets in, Girl 4 comes and waits because the bathroom is being used by Boy, Boy 3 gets out, 
+
+Girl 4 gets in, Girl 5 gets in, Girl 6 gets in, Boy 7 comes and waits because the bathroom is being used by Girl, Girl 5 gets out, Girl 6 gets out, Girl 4 gets out, 
+
+Boy 7 gets in, Girl 8 comes and waits because the bathroom is being used by Boy, Boy 7 gets out, 
+
+Girl 8 gets in, Girl 9 gets in, Boy 10 comes and waits because the bathroom is being used by Girl, Girl 9 gets out, Girl 8 gets out, 
+
+Boy 10 gets in, Boy 10 gets out, 
+
