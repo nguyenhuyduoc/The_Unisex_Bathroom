@@ -1,19 +1,24 @@
 #include "splashkit.h"
 #include <iostream>
-#include "action.cpp"
 #include <algorithm>
 #include <ctime>
 #include <queue>
 #include "unisex.cpp"
 #include <algorithm>
+#include <string>
+#include <sstream>
+#include <vector>
 
-string max_people_input = "";
+
 bool start_simulation = false;
-window main_window, simulation_window;
+bool isValidInput = true;
+window main_window;
 const int WINDOW_WIDTH = 1000;
 const int WINDOW_HEIGHT = 600;
 font font1 = load_font("font1", "./font/PressStart2P-Regular.ttf");
 float speed = 1.5;
+string current_number = "";
+std::vector<int> peopleInToilet;
 
 struct button
 {
@@ -25,6 +30,17 @@ bool isPersonInQueue(std::vector<int> &waitingQueue, int id) {
     return std::find(waitingQueue.begin(), waitingQueue.end(), id) != waitingQueue.end();
 }
 
+std::vector<std::string> read_actions_from_file(const std::string& filename) {
+    std::vector<std::string> actions;
+    std::ifstream file(filename);
+    std::string line;
+    while (std::getline(file, line)) {
+        if (!line.empty()) {
+            actions.push_back(line);
+        }
+    }
+    return actions;
+}
 
 void run_unisex(string number) {
     HANDLE h[THREADCOUNT];
@@ -33,26 +49,26 @@ void run_unisex(string number) {
 	srand(time(0));
 	f.open("output.txt",std::ios::out);
 	
-	mutex=CreateSemaphore(NULL,1,1,NULL);
-	empty=CreateSemaphore(NULL,1,1,NULL);
-	turnstile=CreateSemaphore(NULL,1,1,NULL);
-	male=CreateSemaphore(NULL,1,1,NULL);
-	female=CreateSemaphore(NULL,1,1,NULL);
-	maleCount=CreateSemaphore(NULL,maxPeople,maxPeople,NULL);
-	femaleCount=CreateSemaphore(NULL,maxPeople,maxPeople,NULL);
+	mutex = CreateSemaphore(NULL, 1, 1, NULL);
+	empty = CreateSemaphore(NULL, 1, 1, NULL);
+	turnstile = CreateSemaphore(NULL, 1, 1, NULL);
+	male = CreateSemaphore(NULL, 1, 1, NULL);
+	female = CreateSemaphore(NULL, 1, 1, NULL);
+	maleCount = CreateSemaphore(NULL, maxPeople, maxPeople, NULL);
+	femaleCount = CreateSemaphore(NULL, maxPeople, maxPeople, NULL);
 	
 	
-	for(int i=0;i<THREADCOUNT;i++){
-		int k=rand()%2;
-		if(k==1){
-			h[i]=CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)MalesProcess,NULL,0,&ThreadId);
+	for(int i = 0; i < THREADCOUNT ; i++){
+		int k = rand()%2;
+		if(k == 1){
+			h[i] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)MalesProcess, NULL, 0, &ThreadId);
 		}
 		else{
-			h[i]=CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)FemalesProcess,NULL,0,&ThreadId);
+			h[i] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)FemalesProcess, NULL, 0, &ThreadId);
 		}
 	}
 	
-	WaitForMultipleObjects(THREADCOUNT,h,TRUE,INFINITE);
+	WaitForMultipleObjects(THREADCOUNT, h, TRUE, INFINITE);
 	f.close();
 }
 
@@ -81,7 +97,8 @@ vector<button> create_numpad()
     {
         button btn;
         btn.rect = rectangle_from(start_x + (i % 3) * (width + gap),
-                                  start_y + (i / 3) * (height + gap), width, height);
+                                  start_y + (i / 3) * (height + gap), 
+                                  width, height);
         btn.label = std::to_string(i);
         numpad.push_back(btn);
     }
@@ -102,11 +119,12 @@ button create_start_button()
 void draw_button(const button &btn)
 {
     draw_rectangle(COLOR_GRAY, btn.rect);
-    draw_text(btn.label, COLOR_BLACK, "font1", 20, btn.rect.x + btn.rect.width / 2 - 10, btn.rect.y + btn.rect.height / 2 - 10);
+    draw_text(btn.label, COLOR_BLACK, "font1", 20, 
+              btn.rect.x + btn.rect.width / 2 - 10, 
+              btn.rect.y + btn.rect.height / 2 - 10);
 }
 
-string current_number = "";
-std::vector<int> peopleInToilet;
+
 void run_simulation(const string& number_to_display)
 {
     run_unisex(number_to_display);
@@ -243,7 +261,7 @@ void run_simulation(const string& number_to_display)
 
 
 
-bool isValidInput = true;
+
 void handle_mouse_click(const vector<button>& numpad, const button& start_btn, const button& delete_btn)
 {
     point_2d mouse = mouse_position();
@@ -261,7 +279,7 @@ void handle_mouse_click(const vector<button>& numpad, const button& start_btn, c
 
         if (point_in_rectangle(mouse, start_btn.rect))
         {
-            if (current_number == "0") {
+            if (current_number == "0" || current_number == "") {
                 isValidInput = false;
             }
             else {
@@ -301,7 +319,7 @@ int main()
         draw_text("The Unisex Bathroom Problem Simulation", COLOR_BLACK, "font1", 25, 30, 100);
         draw_text("Enter The Max People Number: " + current_number, COLOR_BLACK, "font1", 20, 200, 150, option_to_screen());
         if (!isValidInput) {
-            draw_text("Invalid input. Please enter a number greater than 0", COLOR_RED, "font1", 10, 200, 180, option_to_screen());
+            draw_text("Invalid input. Please enter a valid number", COLOR_RED, "font1", 10, 250, 180, option_to_screen());
         }
         
         refresh_screen(60);
