@@ -279,7 +279,7 @@ void handle_mouse_click(const vector<button>& numpad, const button& start_btn, c
 
         if (point_in_rectangle(mouse, start_btn.rect))
         {
-            if (current_number == "0" || current_number == "") {
+            if (current_number == "" || stoi(current_number) == 0 ) {
                 isValidInput = false;
             }
             else {
